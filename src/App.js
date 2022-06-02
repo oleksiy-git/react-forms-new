@@ -7,22 +7,30 @@ function App() {
   const [values, setValues] = useState(def);
   const [sendingStatus, setSendingStatus] = useState(true);
   const [submitClicked, setSubmitClicked] = useState(false);
+  const [dataProcessingStatus, setDataProcessingStatus] = useState(false);
 
   const handleSubmit = (e) => {
     e.preventDefault();
 
+    setSubmitClicked(false);
+    setDataProcessingStatus(true);
+
     if (sendingStatus === false) {
-      Promise.resolve(def);
-      setSendingStatus(true);
-      setSubmitClicked(true);
-      console.log("successfully sent");
-      console.log(values);
+      setTimeout(() => {
+        Promise.resolve(def);
+        setSendingStatus(true);
+        setSubmitClicked(true);
+        setDataProcessingStatus(false);
+        console.log("successfully sent");
+      }, 2000);
     } else if (sendingStatus === true) {
-      Promise.reject(new Error("data was not sent"));
-      setSendingStatus(false);
-      setSubmitClicked(true);
-      console.log("an error occured");
-      console.log(values);
+      setTimeout(() => {
+        Promise.reject(new Error("data was not sent"));
+        setSendingStatus(false);
+        setSubmitClicked(true);
+        setDataProcessingStatus(false);
+        console.log("an error occured");
+      }, 2000);
     }
   };
 
@@ -52,6 +60,7 @@ function App() {
 
       {!sendingStatus && submitClicked && <p>error: data was not sent</p>}
       {sendingStatus && submitClicked && <p>data successfully sent</p>}
+      {dataProcessingStatus && <p>processing data..</p>}
     </form>
   );
 }

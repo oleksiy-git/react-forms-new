@@ -2,43 +2,34 @@ import "./App.css";
 import { useState } from "react";
 
 function App() {
-  const def = [10, 9, 8, 7, 6, 5, 4, 3, 2, 1];
+  const defaultArray = [10, 9, 8, 7, 6, 5, 4, 3, 2, 1];
 
-  const [values, setValues] = useState(def);
-  const [sendingStatus, setSendingStatus] = useState(true);
-  const [submitClicked, setSubmitClicked] = useState(false);
-  const [dataProcessingStatus, setDataProcessingStatus] = useState(false);
+  const [values, setValues] = useState(defaultArray);
+  const [count, setCount] = useState(0);
+  const [dataProcessingStatus, setDataProcessingStatus] = useState(null);
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    setDataProcessingStatus("fetching data...");
+    setCount(count + 1);
 
-    setSubmitClicked(false);
-    setDataProcessingStatus(true);
-
-    if (sendingStatus === false) {
-      setTimeout(() => {
-        Promise.resolve(def);
-        setSendingStatus(true);
-        setSubmitClicked(true);
-        setDataProcessingStatus(false);
-        console.log("successfully sent");
-      }, 2000);
-    } else if (sendingStatus === true) {
-      setTimeout(() => {
-        Promise.reject(new Error("data was not sent"));
-        setSendingStatus(false);
-        setSubmitClicked(true);
-        setDataProcessingStatus(false);
-        console.log("an error occured");
-      }, 2000);
-    }
+    setTimeout(() => {
+      if (count % 2) {
+        Promise.resolve(values).then(
+          setDataProcessingStatus("successfully sent")
+        );
+      } else {
+        Promise.reject(new Error("data was not sent")).then(
+          setDataProcessingStatus("data was not sent")
+        );
+      }
+    }, 2000);
   };
 
   const handleRemove = (e) => {
     e.preventDefault();
     const name = e.target.getAttribute("name");
     setValues(values.filter((item) => item !== parseInt(name)));
-    console.log(values);
   };
 
   return (
@@ -58,9 +49,7 @@ function App() {
       })}
       <input type="submit" onClick={handleSubmit} />
 
-      {!sendingStatus && submitClicked && <p>error: data was not sent</p>}
-      {sendingStatus && submitClicked && <p>data successfully sent</p>}
-      {dataProcessingStatus && <p>processing data..</p>}
+      {<p>{dataProcessingStatus}</p>}
     </form>
   );
 }

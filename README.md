@@ -1,3 +1,4 @@
+<<<<<<< fullApp
 # Описание задачи
 Задача реакт 1
 
@@ -24,6 +25,8 @@ const def = [
 В случае успешной отправки возвращать дефорлтные значения инпутов
 В случае ошибки рендерить сообщение об ошибке
 
+=======
+>>>>>>> main
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).

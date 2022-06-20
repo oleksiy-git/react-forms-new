@@ -1,68 +1,70 @@
 import "./App.css";
-import { useState } from "react";
+import {useState} from "react";
+
+const defaultArray = [{alive: 10, val: 10}, {alive: 9, val: 9}, {alive: 8, val: 8}, {
+    alive: 7,
+    val: 7
+}, {alive: 6, val: 6}, {alive: 5, val: 5}, {alive: 4, val: 4}, {alive: 3, val: 3}, {
+    alive: 2,
+    val: 2
+}, {alive: 1, val: 1}];
 
 function App() {
-  const def = [10, 9, 8, 7, 6, 5, 4, 3, 2, 1];
 
-  const [values, setValues] = useState(def);
-  const [sendingStatus, setSendingStatus] = useState(true);
-  const [submitClicked, setSubmitClicked] = useState(false);
-  const [dataProcessingStatus, setDataProcessingStatus] = useState(false);
+    const [values, setValues] = useState(defaultArray);
+    const [count, setCount] = useState(0);
+    const [dataProcessingStatus, setDataProcessingStatus] = useState(null);
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        setDataProcessingStatus("fetching data...");
+        setCount(count + 1);
 
-    setSubmitClicked(false);
-    setDataProcessingStatus(true);
+        setTimeout(() => {
+            if (count % 2) {
+                Promise.resolve(values).then(
+                    setDataProcessingStatus("successfully sent")
+                );
+            } else {
+                Promise.reject(new Error("data was not sent")).then(
+                    setDataProcessingStatus("data was not sent")
+                );
+            }
+        }, 2000);
+    };
 
-    if (sendingStatus === false) {
-      setTimeout(() => {
-        Promise.resolve(def);
-        setSendingStatus(true);
-        setSubmitClicked(true);
-        setDataProcessingStatus(false);
-        console.log("successfully sent");
-      }, 2000);
-    } else if (sendingStatus === true) {
-      setTimeout(() => {
-        Promise.reject(new Error("data was not sent"));
-        setSendingStatus(false);
-        setSubmitClicked(true);
-        setDataProcessingStatus(false);
-        console.log("an error occured");
-      }, 2000);
-    }
-  };
+    const handleRemove = alive => (e) => {
+        e.preventDefault();
+        const index = values.map(({ alive }) => alive).indexOf(alive)
+        values[index] = {
+            ...values[index],
+            alive: false
+        }
+        setValues([...values]);
+    };
 
-  const handleRemove = (e) => {
-    e.preventDefault();
-    const name = e.target.getAttribute("name");
-    setValues(values.filter((item) => item !== parseInt(name)));
-    console.log(values);
-  };
+    return (
+        <form>
+            {values
+                .filter(({ alive }) => alive !== false)
+                .map(({ val, alive }, ) => {
+                return (
+                    <div key={alive}>
+                        <input type="text" defaultValue={val}/>
+                        <spal>{alive}</spal>
+                        <input
+                            type="button"
+                            value="Remove"
+                            onClick={handleRemove(alive)}
+                        />
+                    </div>
+                );
+            })}
+            <input type="submit" onClick={handleSubmit}/>
 
-  return (
-    <form>
-      {values.map((value) => {
-        return (
-          <div key={value}>
-            <input type="text" defaultValue={value} />
-            <input
-              name={value}
-              type="button"
-              value="Remove"
-              onClick={handleRemove}
-            />
-          </div>
-        );
-      })}
-      <input type="submit" onClick={handleSubmit} />
-
-      {!sendingStatus && submitClicked && <p>error: data was not sent</p>}
-      {sendingStatus && submitClicked && <p>data successfully sent</p>}
-      {dataProcessingStatus && <p>processing data..</p>}
-    </form>
-  );
+            {<p>{dataProcessingStatus}</p>}
+        </form>
+    );
 }
 
 export default App;
